@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
-    <title>"Thing"</title>
+    <title>Tomato</title>
 
     <!-- build:css styles/vendor.css -->
     <!-- <link rel="stylesheet" href="vendor/some.contrib.css"> -->
@@ -17,15 +17,14 @@
     <!-- endbuild -->
   </head>
 
-  <body ng-app="Thing">
+  <body ng-app="Tomato" animation="slide-left-right-ios7">
+    <ion-nav-bar class="bar-assertive nav-title-slide-ios7">
+      <ion-nav-back-button class="button-icon icon ion-ios7-arrow-left">
+        Back
+      </ion-nav-back-button>
+    </ion-nav-bar>
 
-    <ion-pane>
-      <ion-header-bar class="bar-stable">
-        <h1 class="title">Ionic Blank Starter</h1>
-      </ion-header-bar>
-      <ion-content class="has-header">
-      </ion-content>
-    </ion-pane>
+    <ion-nav-view></ion-nav-view>
 
     <!-- build:js scripts/vendor.js -->
     <!-- <script src="vendor/someContribJs.js"></script> -->
@@ -38,9 +37,11 @@
     <script src="bower_components/ionic/release/js/ionic-angular.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
-    
+
     <!-- build:js({.tmp,app}) scripts/scripts.js -->
     <script src="scripts/app.js"></script>
+    <script src="scripts/services.js"></script>
+    <script src="scripts/controllers.js"></script>
     <!-- endbuild -->
 
     <!-- cordova script (this will be a 404 during development) -->
