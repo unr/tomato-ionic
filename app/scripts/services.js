@@ -1,5 +1,5 @@
 'use strict';
-angular.module('Thing.services', [])
+angular.module('Tomato.services', [])
 
 /**
  * A simple example service that returns some data.

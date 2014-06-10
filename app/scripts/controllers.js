@@ -1,5 +1,5 @@
 'use strict';
-angular.module('Thing.controllers', [])
+angular.module('Tomato.controllers', [])
 
 .controller('DashCtrl', function($scope) {
 })
