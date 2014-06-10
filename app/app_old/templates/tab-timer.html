@@ -1,0 +1,38 @@
+<ion-view title="{{timer.title}}">
+	<ion-content class="has-header">
+		<ion-nav-buttons side="right">
+			<button class="button icon ion-ios7-plus-outline" > Edit</button>
+		</ion-nav-buttons>
+
+		<div class='card card--timer'>
+			<div class='item item-toggle'>
+				Repeat Timer
+				<label class="toggle toggle-assertive">
+					<input type="checkbox">
+					<div class="track">
+						<div class="handle"></div>
+					</div>
+				</label>
+			</div>
+
+			<div class="item tabs">
+				<a class="tab-item" ng-click="startTimer()">
+					<i class="icon ion-ios7-play-outline"></i>
+				</a>
+				<a class="tab-item" ng-click="stopTimer()">
+					<i class="icon ion-ios7-pause-outline"></i>
+				</a>
+				<a class="tab-item" ng-click="resetTimer()">
+					<i class="icon ion-ios7-reload"></i>
+				</a>
+			</div>
+
+			<div class='item item--timer'>
+				<timer countdown="timer.length.value" interval="1" autostart="false">
+				</timer>
+			</div>
+
+		</div>
+
+	</ion-content>
+</ion-view>

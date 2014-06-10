@@ -1,0 +1,45 @@
+<div class="modal">
+	<ion-header-bar>
+		<button ng-click="closeNewModal()" class='button button-clear icon ion-ios7-close-outline icon-left'></button>
+		<h1 class="title">Add New Timer</h1>
+		<button ng-click="saveNewModal()" class='button button-clear icon ion-ios7-checkmark-outline icon-right'></button>
+	</ion-header-bar>
+	<ion-content>
+		<div class='list'>
+			<label class="item item-input">
+				<span class='input-label'>Timer Name</span>
+				<input type="text" ng-model="modal.newTimer.title" name="title">
+			</label>
+
+			<label class="item item-input item-select">
+				<div class="input-label">
+					Timer Length
+				</div>
+				<select ng-model="model.newTimer.length"
+					ng-options="opt as opt.label for opt in timer_lengths">
+				</select>
+			</label>
+
+			<label class="item item-input item-select">
+				<div class="input-label">
+					Break Length
+				</div>
+				<select ng-model="model.newTimer.break"
+					ng-options="opt as opt.label for opt in break_lengths">
+				</select>
+			</label>
+
+			<!-- Should be added to the timer view itself, not a setting
+			<label class="item item-toggle">
+				Repeat This Timer
+				<label class="toggle toggle-assertive">
+					<input type="checkbox">
+						<div class="track">
+						<div class="handle"></div>
+					</div>
+				</label>
+			</label>
+			-->
+		</div>
+	</ion-content>
+</div>

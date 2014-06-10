@@ -1,0 +1,31 @@
+{
+  "name": "ng-cordova",
+  "version": "0.1.1-alpha",
+  "homepage": "http://ngCordova.com/",
+  "authors": [
+    "Max Lynch <max@drifty.com>",
+    "Paolo Bernasconi <paolo.enrico.bernasconi@gmail.com>"
+  ],
+  "description": "AngularJS Cordova wrappers for common Cordova plugins.",
+  "main": "./dist/ng-cordova.js",
+  "keywords": [
+    "cordova",
+    "phonegap",
+    "angular",
+    "angularjs",
+    "ionic",
+    "cordova plugin"
+  ],
+  "license": "MIT",
+  "private": false,
+  "_cacheHeaders": {
+    "ETag": "\"7980897625b489c6c4926134c275e7d695bec245\"",
+    "Content-Type": "application/zip",
+    "Content-Disposition": "attachment; filename=ng-cordova-master.zip"
+  },
+  "_release": "e-tag:798089762",
+  "_source": "https://github.com/driftyco/ng-cordova/archive/master.zip",
+  "_target": "*",
+  "_originalSource": "https://github.com/driftyco/ng-cordova/archive/master.zip",
+  "_direct": true
+}
