@@ -72,6 +72,66 @@ angular.module('Tomato.controllers', [])
 
 	// Grab our existing timers
 	$scope.timers = Timers.all();
+
+	$scope.deleteAllTimers = function() {
+		$scope.timers = [];
+		Timers.save($scope.timers);
+	}
+})
+
+/**
+ * Single Timer Controller
+ *
+ * When viewing a single timer, controls the start/stop and editing
+ * of the timer.
+ */
+.controller('TimerCtrl', function($scope, $stateParams, Timers) {
+
+	// gets our current views timer
+	$scope.timer = Timers.get($stateParams.timerId);
+
+	// Timer running variable, false by default
+	$scope.timerRunning = false;
+
+	/**
+	 * Start Timer
+	 */
+	$scope.startTimer = function() {
+		$scope.$broadcast('timer-start');
+		$scope.timerRunning = true;
+	};
+
+	/**
+	 * Stop Timer
+	 */
+	$scope.stopTimer = function() {
+		$scope.$broadcast('timer-stop');
+		$scope.timerRunning = false;
+	};
+
+	/**
+	 * Reset our timer length to original_length
+	 */
+	$scope.resetTimer = function() {
+		$scope.timer = undefined;
+		$scope.$broadcast('timer-clear');
+	};
+
+	/**
+	 * fires when the timer ticks.
+	$scope.$on('timer-tick', function (event, data){
+		$scope.timer.percentage = parseFloat(100 - ($scope.timer.length / $scope.original_length * 100)).toFixed(2);
+	});
+	 */
+
+	/**
+	 * fires when the timer is paused.
+	 */
+	$scope.$on('timer-stopped', function (event, data){
+		console.log('Timer Stopped - data = ', data);
+		console.log($scope.timer.length);
+	});
+
 })
 
 .controller('AccountCtrl', function($scope) {
