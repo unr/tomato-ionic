@@ -44,6 +44,9 @@ angular.module('Tomato.services', [])
 		var timers = angular.fromJson(timerString);
 	}
 
+	/**
+	 * Utility function, to sort timer by id
+	 */
 	var compare = function(a,b) {
 		if (a.id > b.id)
 			return -1;
@@ -52,6 +55,9 @@ angular.module('Tomato.services', [])
 		return 0;
 	}
 
+	/**
+	 * Utility function, to find timer by ID.
+	 */
 	var findByID = function(id, array) {
 		for( var i = 0 ; i < array.length ; i++ ) {
 			if (parseInt(array[i].id) === parseInt(id)) {
@@ -61,13 +67,35 @@ angular.module('Tomato.services', [])
 		}
 	}
 
+	/**
+	 * Utility function, to find timer by slug
+	 */
+	var findBySlug = function(slug, array) {
+		for( var i = 0 ; i < array.length ; i++ ) {
+			if (array[i].slug === slug) {
+				return array[i];
+				break;
+			}
+		}
+	}
 
+	/**
+	 * Utility function for generating slugs
+	 */
+	var convertToSlug = function(string) {
+		return string.toLowerCase().replace(/[^\w ]+/g,'').replace(/ +/g,'-');
+	}
+
+
+	/**
+	 * Return functions, usable under the Timers.func() namespace
+	 */
 	return {
 		all: function() {
 			return timers;
 		},
 		get: function(timerId) {
-			return findByID(timerId, timers);
+			return findBySlug(timerId, timers);
 		},
 		save: function(timers) {
 			window.localStorage['timers'] = angular.toJson(timers);
@@ -93,6 +121,7 @@ angular.module('Tomato.services', [])
 			return {
 				id: parseInt(currentIndex)+1,
 				title: '',
+				slug: '',
 				length: 30000,
 				break: 6000,
 				repeat: true,

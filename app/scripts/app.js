@@ -40,6 +40,16 @@ angular.module('Tomato', ['ionic', 'Tomato.controllers', 'Tomato.services'])
       }
     })
 
+    .state('tab.timer', {
+      url: '/timer/:timerId',
+      views: {
+        'tab-dash': {
+          templateUrl: 'templates/tab-timer.html',
+          controller: 'TimerCtrl'
+        }
+      }
+    })
+
     .state('tab.settings', {
       url: '/settings',
       views: {
