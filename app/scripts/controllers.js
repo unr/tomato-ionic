@@ -8,6 +8,8 @@ angular.module('Tomato.controllers', ['timer'])
  */
 .controller('AppCtrl', function($scope, $ionicModal, Timers, Options){
 
+	$scope.debug = true;
+
 	/**
 	 * Scope flag used for notifying the system whether or not the modal
 	 * is editing a timer, or creating a new timer.
@@ -137,8 +139,11 @@ angular.module('Tomato.controllers', ['timer'])
  */
 .controller('TimerCtrl', function($scope, $stateParams, Timers) {
 
-	$scope.editTimer = function() {
-		$scope.openModal($scope.timer.slug);
+	/**
+	 * Utility function for adding minutes to time
+	 */
+	var addMinutes = function(date_obj, minutes) {
+	    return new Date(date_obj.getTime() + minutes*60000);
 	}
 
 	// gets our current views timer
@@ -148,12 +153,35 @@ angular.module('Tomato.controllers', ['timer'])
 	$scope.timerRunning = false;
 
 	/**
+	 * Edit timer
+	 *
+	 * Opens the current scopes timer in a modal for editing.
+	 */
+	$scope.editTimer = function() {
+		$scope.openModal($scope.timer.slug);
+	}
+
+	/**
 	 * Start Timer
 	 */
 	$scope.startTimer = function() {
-		console.log('start timer clicked');
-		$scope.$broadcast('timer-start');
+
+		// timer starts right now
+		$scope.timer_started = new Date();
+
+		// Testing scope length, 5 minutes
+		$scope.timer.length = 1;
+
+		// Timer should end in start+timer_length
+		$scope.timer_should_end = addMinutes($scope.timer_started, $scope.timer.length);
+
+		$scope.timer_start_time = $scope.timer_started.getTime();
+		$scope.timer_end_time = $scope.timer_should_end.getTime();
+
+		// Start our timer
 		$scope.timerRunning = true;
+		$scope.$broadcast('timer-start');
+
 	};
 
 	/**
@@ -168,7 +196,6 @@ angular.module('Tomato.controllers', ['timer'])
 	 * Reset our timer length to original_length
 	 */
 	$scope.resetTimer = function() {
-		$scope.timer = undefined;
 		$scope.$broadcast('timer-clear');
 	};
 
@@ -184,7 +211,7 @@ angular.module('Tomato.controllers', ['timer'])
 	 */
 	$scope.$on('timer-stopped', function (event, data){
 		console.log('Timer Stopped - data = ', data);
-		console.log($scope.timer.length);
+		console.log("timer length: ".$scope.timer.length);
 	});
 
 })

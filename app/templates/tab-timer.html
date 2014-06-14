@@ -28,7 +28,18 @@
 			</div>
 
 			<div class='item item--timer'>
-				<timer countdown="100" interval="1">
+				<p>Starts:<br />{{timer_started}}</p>
+				<p>Should end:<br />{{timer_should_end}}</p>
+				<br />
+				<br />
+				<br />
+				<br />
+				<br />
+				<br />
+				<br />
+				<br />
+				<timer start-time="timer_start_time" end-time="timer_end_time" interval="1000">
+					{{hours}} hours, {{minutes}} minutes, {{seconds}} seconds.
 				</timer>
 			</div>
 
