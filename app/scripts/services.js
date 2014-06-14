@@ -108,7 +108,7 @@ angular.module('Tomato.services', [])
 		 * in the new Timer modal.
 		 */
 		newTimer: function() {
-			var timers_copy = timers,
+			var timers_copy = angular.copy(timers),
 				highest_index_first = timers_copy.sort(compare),
 				currentIndex = 0;
 
