@@ -122,7 +122,6 @@ angular.module('Tomato.controllers', ['timer'])
 			if ($scope.debug) {
 				console.log("Timer passed to modal::");
 				console.log(timer_slug);
-				console.log($scope.modal.timer);
 				console.log("Modal launched::");
 				console.log($scope.modal);
 			}
@@ -290,7 +289,6 @@ angular.module('Tomato.controllers', ['timer'])
 
 	// gets our current views timer
 	$rootScope.timer = Timers.get($stateParams.timerId);
-	$scope.timer.length = 1;
 
 	// Timer is not set until begin is hit first time
 	$scope.timer_set = false;
@@ -386,8 +384,10 @@ angular.module('Tomato.controllers', ['timer'])
 	 * fires when the timer is paused.
 	 */
 	$scope.$on('timer-stopped', function (event, data){
-		console.log(event);
-		console.log('Timer Stopped - data = ', data);
+		if ($scope.debug) {
+			console.log(event);
+			console.log('Timer Stopped - data = ', data);
+		}
 	});
 
 })
