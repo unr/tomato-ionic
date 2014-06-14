@@ -2,6 +2,13 @@
 angular.module('Tomato.controllers', [])
 
 .controller('AppCtrl', function($scope, $ionicModal, Timers, Options){
+
+	/**
+	 * Scope flag used for notifying the system whether or not the modal
+	 * is editing a timer, or creating a new timer.
+	 */
+	$scope.editing = false;
+
 	/**
 	 * Utility function for generating slugs
 	 */
@@ -35,6 +42,7 @@ angular.module('Tomato.controllers', [])
 			// if you specified a timer
 			if (timer_slug) {
 				$scope.modal.timer = Timers.get(timer_slug);
+				$scope.editing = true;
 			} else {
 				// Create our new timer
 				$scope.modal.timer = Timers.newTimer();
@@ -42,6 +50,8 @@ angular.module('Tomato.controllers', [])
 				// Set our timer/break select bindings
 				$scope.modal.timer.length = $scope.timer_lengths[0];
 				$scope.modal.timer.break = $scope.break_lengths[0];
+
+				$scope.editing = false;
 			}
 
 			$scope.modal.show();
@@ -67,17 +77,18 @@ angular.module('Tomato.controllers', [])
 			return false;
 		}
 
-		// Our modal needs a unique slug
-		// and ensure we keep it up to date
-		$scope.modal.timer.slug = convertToSlug($scope.modal.timer.title);
+		// When first creating a timer, generate a slug for it
+		if ( !$scope.editing ) {
+			$scope.modal.timer.slug = convertToSlug($scope.modal.timer.title);
+			$scope.timers.push($scope.modal.timer);
+			Timers.save($scope.timers);
+		}
 
-		// Add our new timer to the list of timers
-		$scope.timers.push($scope.modal.newTimer);
-
-		// Save our timers to local storage
 		Timers.save($scope.timers);
 
 		$scope.modal.hide();
+
+		$scope.editing = false;
 	};
 
 	/**
