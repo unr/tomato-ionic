@@ -16,10 +16,10 @@
 			</div>
 
 			<div class="item tabs">
-				<a class="tab-item" ng-click="startTimer()">
+				<a class="tab-item" ng-click="beginTimer()">
 					<i class="icon ion-ios7-play-outline"></i>
 				</a>
-				<a class="tab-item" ng-click="stopTimer()">
+				<a class="tab-item" ng-click="pauseTimer()">
 					<i class="icon ion-ios7-pause-outline"></i>
 				</a>
 				<a class="tab-item" ng-click="resetTimer()">
@@ -32,13 +32,7 @@
 				<p>Should end:<br />{{timer_should_end}}</p>
 				<br />
 				<br />
-				<br />
-				<br />
-				<br />
-				<br />
-				<br />
-				<br />
-				<timer start-time="timer_start_time" end-time="timer_end_time" interval="1000">
+				<timer ng-if="timer_set" start-time="timer_start_time" end-time="timer_end_time">
 					{{hours}} hours, {{minutes}} minutes, {{seconds}} seconds.
 				</timer>
 			</div>

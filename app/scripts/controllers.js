@@ -139,18 +139,60 @@ angular.module('Tomato.controllers', ['timer'])
  */
 .controller('TimerCtrl', function($scope, $stateParams, Timers) {
 
+	var minutesToMilliseconds = function(minutes) {
+		return minutes*60000;
+	}
+
 	/**
 	 * Utility function for adding minutes to time
 	 */
 	var addMinutes = function(date_obj, minutes) {
-	    return new Date(date_obj.getTime() + minutes*60000);
+	    return new Date(date_obj.getTime() + minutesToMilliseconds(minutes));
 	}
+
+	/**
+	 * Utility function for adding milliseconds to time
+	 */
+	var addMilliseconds = function(date_obj, milliseconds) {
+	    return new Date(date_obj.getTime() + milliseconds);
+	}
+
+	/**
+	 * Start Angular Timer, Utility Function
+	 */
+	var startTimer = function() {
+		$scope.$broadcast('timer-start');
+		$scope.timer_running = true;
+	};
+
+	/**
+	 * Stop Angular Timer, Utility Function
+	 */
+	var stopTimer = function() {
+		$scope.$broadcast('timer-stop');
+		$scope.timer_running = false;
+	};
+
+	/**
+	 * clear Angular Timer, Utility Function
+	 */
+	var clearTimer = function() {
+		$scope.$broadcast('timer-clear');
+	};
+
 
 	// gets our current views timer
 	$scope.timer = Timers.get($stateParams.timerId);
+	$scope.timer.length = 1;
+
+	// Timer is not set until begin is hit first time
+	$scope.timer_set = false;
 
 	// Timer running variable, false by default
-	$scope.timerRunning = false;
+	$scope.timer_running = false;
+
+	// time remaining variable, 0 by default
+	$scope.timer_remaining = 0;
 
 	/**
 	 * Edit timer
@@ -162,47 +204,74 @@ angular.module('Tomato.controllers', ['timer'])
 	}
 
 	/**
-	 * Start Timer
+	 * Begin Timer
+	 *
+	 * Sets up the timer attributes, and then runs start timer
 	 */
-	$scope.startTimer = function() {
+	$scope.beginTimer = function() {
 
-		// timer starts right now
+		// The timer will begin counting down from now
 		$scope.timer_started = new Date();
 
-		// Testing scope length, 5 minutes
-		$scope.timer.length = 1;
+		/**
+		 * If the timer was paused, and there is timer_remaining
+		 * available.
+		 *
+		 * Start a new timer, and replace timer.length with
+		 * timer_remaining.
+		 */
+		console.log($scope.timer_remaining);
+		if ( $scope.timer_remaining > 0 ) {
+			$scope.timer_should_end = addMilliseconds($scope.timer_started, $scope.timer_remaining);
+		} else {
+			$scope.timer_should_end = addMinutes($scope.timer_started, $scope.timer.length);
+		}
 
-		// Timer should end in start+timer_length
-		$scope.timer_should_end = addMinutes($scope.timer_started, $scope.timer.length);
+		$scope.timer_set = true;
 
+		// converts our timer values to unix, for use in view
 		$scope.timer_start_time = $scope.timer_started.getTime();
 		$scope.timer_end_time = $scope.timer_should_end.getTime();
 
-		// Start our timer
-		$scope.timerRunning = true;
-		$scope.$broadcast('timer-start');
+		startTimer();
 
 	};
 
 	/**
 	 * Stop Timer
 	 */
-	$scope.stopTimer = function() {
-		$scope.$broadcast('timer-stop');
-		$scope.timerRunning = false;
+	$scope.pauseTimer = function() {
+		// Timestamp when we stopped the timer, for use when continuing it
+		$scope.timer_stopped = new Date();
+
+		// Difference in ms, in order to unpause timer
+		$scope.timer_remaining = $scope.timer_should_end - $scope.timer_stopped;
+
+		stopTimer();
+
 	};
 
 	/**
-	 * Reset our timer length to original_length
+	 * Resets timer difference
+	 *
+	 * When timer_remaining is set to 0, the next loop of beginTimer
+	 * will start with the original timer value again.
+	 *
 	 */
 	$scope.resetTimer = function() {
-		$scope.$broadcast('timer-clear');
+		clearTimer();
+
+		$scope.timer_remaining = 0;
+
+		$scope.timer_set = false;
 	};
 
 	/**
-	 * fires when the timer ticks.
+	 * A 'tick' event from the angular-timer, however this seems to wait
+	 * until the timer stops to finish updating events.
+	 *
+	 * Doesn't play nice with our intentions.
 	$scope.$on('timer-tick', function (event, data){
-		$scope.timer.percentage = parseFloat(100 - ($scope.timer.length / $scope.original_length * 100)).toFixed(2);
 	});
 	 */
 
@@ -210,8 +279,8 @@ angular.module('Tomato.controllers', ['timer'])
 	 * fires when the timer is paused.
 	 */
 	$scope.$on('timer-stopped', function (event, data){
+		console.log(event);
 		console.log('Timer Stopped - data = ', data);
-		console.log("timer length: ".$scope.timer.length);
 	});
 
 })
