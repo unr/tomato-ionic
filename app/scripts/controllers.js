@@ -1,6 +1,11 @@
 'use strict';
-angular.module('Tomato.controllers', [])
+angular.module('Tomato.controllers', ['timer'])
 
+/**
+ * App Controller
+ *
+ * Housing controller for our app, lets us use global values and functions.
+ */
 .controller('AppCtrl', function($scope, $ionicModal, Timers, Options){
 
 	/**
@@ -146,6 +151,7 @@ angular.module('Tomato.controllers', [])
 	 * Start Timer
 	 */
 	$scope.startTimer = function() {
+		console.log('start timer clicked');
 		$scope.$broadcast('timer-start');
 		$scope.timerRunning = true;
 	};
