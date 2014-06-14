@@ -8,20 +8,20 @@ angular.module('Tomato.services', [])
 	return {
 		timer_lengths: function() {
 			return [
-				{ label : "5:00" , value : 100 },
-				{ label : "10:00" , value : 60000 },
-				{ label : "15:00" , value : 90000 },
-				{ label : "20:00" , value : 120000 },
-				{ label : "25:00" , value : 150000 }
+				{ label : "5:00" , value : 5 },
+				{ label : "10:00" , value : 10 },
+				{ label : "15:00" , value : 15 },
+				{ label : "20:00" , value : 20 },
+				{ label : "25:00" , value : 25 }
 			];
 		},
 		break_lengths: function() {
 			return [
-				{ label : "1:00" , value : 6000 },
-				{ label : "2:00" , value : 12000 },
-				{ label : "3:00" , value : 18000 },
-				{ label : "4:00" , value : 24000 },
-				{ label : "5:00" , value : 30000 }
+				{ label : "1:00" , value : 1 },
+				{ label : "2:00" , value : 2 },
+				{ label : "3:00" , value : 3 },
+				{ label : "4:00" , value : 4 },
+				{ label : "5:00" , value : 5 }
 			];
 		}
 	}
@@ -32,6 +32,19 @@ angular.module('Tomato.services', [])
  *
  * This will handle reading/writing from localstorage, and de/encoding the
  * json.
+ *
+ * A timer object should look like:
+ *
+ * timer = {
+ * 		id: int,
+ * 		title: string,
+ * 		slug: string,
+ * 		length: {label, value},
+ * 		break: {label, value},
+ * 		repeat_count: int,
+ * 		repeat: boolean,
+ * 		color: string
+ * }
  */
 .factory('Timers', function() {
 	var timers = [];
@@ -94,8 +107,8 @@ angular.module('Tomato.services', [])
 		all: function() {
 			return timers;
 		},
-		get: function(timerId) {
-			return findBySlug(timerId, timers);
+		get: function(timerSlug) {
+			return findBySlug(timerSlug, timers);
 		},
 		save: function(timers) {
 			window.localStorage['timers'] = angular.toJson(timers);
@@ -119,13 +132,7 @@ angular.module('Tomato.services', [])
 			}
 
 			return {
-				id: parseInt(currentIndex)+1,
-				title: '',
-				slug: '',
-				length: 30000,
-				break: 6000,
-				repeat: true,
-				repeat_count: 0
+				id: parseInt(currentIndex)+1
 			}
 		}
 	}

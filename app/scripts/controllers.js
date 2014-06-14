@@ -6,21 +6,53 @@ angular.module('Tomato.controllers', ['timer'])
  *
  * Housing controller for our app, lets us use global values and functions.
  */
-.controller('AppCtrl', function($scope, $ionicModal, Timers, Options){
+.controller('AppCtrl', function($scope, $rootScope, $ionicModal, Timers, Options){
 
+	/**
+	 * Should be set to false, when building for production. This will show
+	 * debug events in console.
+	 */
 	$scope.debug = true;
 
 	/**
-	 * Scope flag used for notifying the system whether or not the modal
-	 * is editing a timer, or creating a new timer.
+	 * Whether or not we are 'editing' an item flag. Used for saving modals
+	 * and making decisions during edit flows.
 	 */
 	$scope.editing = false;
 
 	/**
+	 * Get our timers for use in scope.
+	 *
+	 * This currently makes them app wide, but I'd prefer this to only exist
+	 * on the dash...
+	 *
+	 * But maybe it should be here too anyway. #devthoughts
+	 */
+	$scope.timers = Timers.all();
+
+	/**
 	 * Utility function for generating slugs
+	 *
+	 * These aren't used visually, to create a sense of uniqueness
+	 * I will apply a number of 1-10 at the end of a slug.
 	 */
 	var convertToSlug = function(string) {
-		return string.toLowerCase().replace(/[^\w ]+/g,'').replace(/ +/g,'-');
+		var bonus_number = Math.floor(Math.random() * 6) + 1;
+		return string.toLowerCase().replace(/[^\w ]+/g,'').replace(/ +/g,'-')+bonus_number;
+	}
+
+	/**
+	 * Utility function for finding the index of a timer based
+	 * on its slug.
+	 */
+	var getTimerIndexBySlug = function( timer_slug ) {
+		var length = $scope.timers.length;
+		for (var i = 0; i < length; i++) {
+			if( ($scope.timers[i].slug === timer_slug ) ) {
+				return i;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -30,46 +62,81 @@ angular.module('Tomato.controllers', ['timer'])
 	$scope.break_lengths = Options.break_lengths();
 
 	/**
-	 * Create and open our new-timer modal.
+	 * New Timer Modal
+	 *
+	 * This will launch the modal with a new timer entered in scope.
 	 */
-	$scope.openModal = function( timer_slug ) {
+	$scope.newTimerModal = function() {
+		$scope.modal = null;
+
+		// this is new, not editing
+		$scope.editing = false;
+
 		/**
-		 * Originally we loaded this modal once, and tried to
-		 * delete the 'new' object within it.
-		 *
-		 * That failed, I now create a new IonicModal each time.
+		 * When called, lets generate a new instance of scope.modal.
 		 */
-		$ionicModal.fromTemplateUrl('templates/modals/new-timer.html', {
+		$ionicModal.fromTemplateUrl("templates/modals/timer-new.html", {
 			scope: $scope,
 			animation: 'slide-in-up'
 		}).then(function(modal) {
 			$scope.modal = modal;
 
-
-			// if you specified a timer
-			if (timer_slug) {
-				$scope.modal.timer = Timers.get(timer_slug);
-				$scope.editing = true;
-			} else {
-				// Create our new timer
-				$scope.modal.timer = Timers.newTimer();
-
-				// Set our timer/break select bindings
-				$scope.modal.timer.length = $scope.timer_lengths[0];
-				$scope.modal.timer.break = $scope.break_lengths[0];
-
-				$scope.editing = false;
-			}
+			$scope.modal.timer = Timers.newTimer();
 
 			$scope.modal.show();
+
+			if ($scope.debug) {
+				console.log("New Timer Modal launched::");
+				console.log($scope.modal);
+			}
 		});
-	};
+	}
+
+	$scope.editTimerModal = function( timer_slug ) {
+		$scope.modal = null;
+
+		$scope.editing = true;
+
+		if (!timer_slug) {
+			return false;
+
+			if ($scope.debug) {
+				console.log("Error: No timer_slug passed to $scope.editTimerModal();")
+			}
+		}
+
+		/**
+		 * When called, lets generate a new instance of scope.modal.
+		 */
+		$ionicModal.fromTemplateUrl("templates/modals/timer-edit.html", {
+			scope: $scope,
+			animation: 'slide-in-up'
+		}).then(function(modal) {
+			$scope.modal = modal;
+
+			// we make a copy, so our edits aren't immediate
+			$scope.modal.timer = angular.copy(Timers.get(timer_slug));
+
+			$scope.modal.show();
+
+			if ($scope.debug) {
+				console.log("Timer passed to modal::");
+				console.log(timer_slug);
+				console.log($scope.modal.timer);
+				console.log("Modal launched::");
+				console.log($scope.modal);
+			}
+		});
+	}
 
 	/**
 	 * Animates out the modal.
 	 */
 	$scope.closeModal = function() {
 		$scope.modal.hide();
+		$scope.modal.timer = undefined;
+
+		$scope.editing = false;
 	};
 
 	/**
@@ -78,24 +145,74 @@ angular.module('Tomato.controllers', ['timer'])
 	$scope.saveModal = function() {
 		var default_timer = Timers.newTimer();
 
-		// Check that we have at least modified the timer title
-		if( $scope.modal.timer.title === default_timer.title ) {
-			alert("Please enter a title for your timer.");
-			return false;
+		/**
+		 * TODO: This should be abstracted to a validation function
+		 *
+		 * It is wrapped in an if, purely for visual appearance
+		 * to make me remove it later.
+		 */
+		if (true) {
+			// Check that we have at least modified the timer title
+			if( $scope.modal.timer.title === default_timer.title ) {
+				alert("Please enter a title for your timer.");
+				return false;
+			}
+
+			/**
+			 * If we don't have a length selected, warn user
+			 *
+			 * Temporary validation
+			 */
+			if( $scope.modal.timer.length === undefined) {
+				alert("Please select a length for your timer.");
+				return false;
+			}
+
+			/**
+			 * If we don't have a length selected, warn user
+			 *
+			 * Temporary validation
+			 */
+			if( $scope.modal.timer.break === undefined) {
+				alert("Please select a length for your break.");
+				return false;
+			}
 		}
 
-		// When first creating a timer, generate a slug for it
-		if ( !$scope.editing ) {
+		/**
+		 * If our timer doesn't have a slug, ensure it has one.
+		 */
+		if ( !$scope.modal.timer.slug ) {
 			$scope.modal.timer.slug = convertToSlug($scope.modal.timer.title);
+		}
+
+		/**
+		 * If we are not editing, this is a new timer.
+		 *
+		 * We need to add this timer to our model.
+		 */
+		if ( !$scope.editing ) {
 			$scope.timers.push($scope.modal.timer);
-			Timers.save($scope.timers);
+
+		/**
+		 * If we are editing, we need to copy our duplicate timer,
+		 * back over itself to preserve our edits.
+		 */
+		} else {
+			console.log($scope.timers);
+
+			// gets the current timer index
+			var index_to_update = getTimerIndexBySlug($scope.modal.timer.slug);
+
+			$scope.timers[index_to_update] = angular.copy($scope.modal.timer);
+			$rootScope.timer = angular.copy($scope.modal.timer);
+
+			console.log($scope.timers);
 		}
 
 		Timers.save($scope.timers);
 
 		$scope.modal.hide();
-
-		$scope.editing = false;
 	};
 
 	/**
@@ -107,16 +224,6 @@ angular.module('Tomato.controllers', ['timer'])
 		$scope.timers = [];
 		Timers.save($scope.timers);
 	}
-
-	/**
-	 * Get our timers for use in scope.
-	 *
-	 * This currently makes them app wide, but I'd prefer this to only exist
-	 * on the dash...
-	 *
-	 * But maybe it should be here too anyway. #devthoughts
-	 */
-	$scope.timers = Timers.all();
 
 })
 
@@ -137,7 +244,7 @@ angular.module('Tomato.controllers', ['timer'])
  * When viewing a single timer, controls the start/stop and editing
  * of the timer.
  */
-.controller('TimerCtrl', function($scope, $stateParams, Timers) {
+.controller('TimerCtrl', function($scope, $rootScope, $stateParams, Timers) {
 
 	var minutesToMilliseconds = function(minutes) {
 		return minutes*60000;
@@ -182,7 +289,7 @@ angular.module('Tomato.controllers', ['timer'])
 
 
 	// gets our current views timer
-	$scope.timer = Timers.get($stateParams.timerId);
+	$rootScope.timer = Timers.get($stateParams.timerId);
 	$scope.timer.length = 1;
 
 	// Timer is not set until begin is hit first time
