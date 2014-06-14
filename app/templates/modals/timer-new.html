@@ -11,17 +11,12 @@
 				<input type="text" ng-model="modal.timer.title" name="title">
 			</label>
 
-			<label class="item item-input">
-				<span class='input-label'>Timer Slug</span>
-				<input type="text" ng-model="modal.timer.slug" name="title">
-			</label>
-
 			<label class="item item-input item-select">
 				<div class="input-label">
 					Timer Length
 				</div>
-				<select ng-model="model.timer.length"
-					ng-options="opt as opt.label for opt in timer_lengths">
+				<select ng-model="modal.timer.length"
+					ng-options="opt.value as opt.label for opt in timer_lengths">
 				</select>
 			</label>
 
@@ -29,22 +24,10 @@
 				<div class="input-label">
 					Break Length
 				</div>
-				<select ng-model="model.timer.break"
-					ng-options="opt as opt.label for opt in break_lengths">
+				<select ng-model="modal.timer.break"
+					ng-options="opt.value as opt.label for opt in break_lengths">
 				</select>
 			</label>
-
-			<!-- Should be added to the timer view itself, not a setting
-			<label class="item item-toggle">
-				Repeat This Timer
-				<label class="toggle toggle-assertive">
-					<input type="checkbox">
-						<div class="track">
-						<div class="handle"></div>
-					</div>
-				</label>
-			</label>
-			-->
 		</div>
 	</ion-content>
 </div>
