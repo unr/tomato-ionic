@@ -9,7 +9,7 @@
 				<div class='chart' id="timer-chart"></div>
 			</div>
 
-			<timer ng-if="timer_set" interval="10000" start-time="timer_start_time" end-time="timer_end_time">
+			<timer ng-if="timer_set" interval="10000" class='the-timer' start-time="timer_start_time" end-time="timer_end_time">
 				{{mminutes}}:{{sseconds}}
 			</timer>
 			<div ng-if="!timer_set" class='placeholder-timer'>
@@ -20,10 +20,10 @@
 		<div class='card card--break'>
 			<div class='item'>
 				<p><strong>Break:</strong></p>
-				<timer ng-if="break_timer_set" interval="10000" start-time="break_timer_start_time" end-time="break_timer_end_time">
+				<timer ng-if="break_timer_set" class='the-break-timer' interval="10000" start-time="break_timer_start_time" end-time="break_timer_end_time">
 					{{mminutes}}:{{sseconds}}
 				</timer>
-				<div ng-if="!break_timer_set" class='placeholder-timer'>
+				<div ng-if="!break_timer_set" class='placeholder-break-timer'>
 					{{timer.break.label}}
 				</div>
 				<div id='break-progress'

@@ -16,7 +16,7 @@
 					Timer Length
 				</div>
 				<select ng-model="modal.timer.length"
-					ng-options="opt as opt.label for opt in timer_lengths">
+					ng-options="opt as opt.label for opt in timer_lengths track by opt.value">
 				</select>
 			</label>
 
@@ -25,7 +25,7 @@
 					Break Length
 				</div>
 				<select ng-model="modal.timer.break"
-					ng-options="opt as opt.label for opt in break_lengths">
+					ng-options="opt as opt.label for opt in break_lengths track by opt.value">
 				</select>
 			</label>
 		</div>

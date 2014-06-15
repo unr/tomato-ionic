@@ -11,6 +11,32 @@ img {
 	max-width: 100%;
 }
 
+/**
+ * Timer styling
+ */
+.card--timer {
+	position: relative;
+}
+
+/*
+ * Placeholder styling is the timer before displaying.
+ * regular timer is the default text.
+ */
+.placeholder-timer, .the-timer {
+	position: absolute;
+	z-index: 1000;
+	top: 50%;
+	left: 50%;
+	width: 110px;
+	text-align: center;
+	margin-left: -55px;
+	font-size: 28px;
+	font-weight: 100;
+	border: solid 1px #ccc;
+	padding: 8px 0;
+	border-radius: 3px;
+}
+
 
 /**
  * Chart styling
