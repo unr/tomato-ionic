@@ -8,7 +8,7 @@
 		</ion-nav-buttons>
 
 		<ion-list>
-			<ion-item ng-repeat="timer in timers" type="item-text-wrap" href="#/tab/timer/{{timer.slug}}">
+			<ion-item bindonce ng-repeat="timer in timers" type="item-text-wrap" href="#/tab/timer/{{timer.slug}}">
 				{{timer.title}}
 			</ion-item>
 		</ion-list>

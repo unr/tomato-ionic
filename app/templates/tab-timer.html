@@ -1,4 +1,4 @@
-<ion-view title="{{timer.title}}">
+<ion-view bindonce title="{{timer.title}}">
 	<ion-content class="has-header">
 		<ion-nav-buttons side="right">
 			<button class="button button-clear icon ion-ios7-compose-outline" ng-click="editTimerModal(timer.slug)"></button>
@@ -7,7 +7,7 @@
 		<div class='card card--timer'>
 			<div id="timer-chart">showing you stuff</div>
 
-			<timer ng-if="timer_set" interval="1000" start-time="timer_start_time" end-time="timer_end_time">
+			<timer ng-if="timer_set" interval="10000" start-time="timer_start_time" end-time="timer_end_time">
 				{{mminutes}}:{{sseconds}}
 			</timer>
 			<div ng-if="!timer_set" class='placeholder-timer'>

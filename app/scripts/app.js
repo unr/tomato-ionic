@@ -6,7 +6,7 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('Tomato', ['ionic', 'Tomato.controllers', 'Tomato.services'])
+angular.module('Tomato', ['ionic', 'Tomato.controllers', 'Tomato.services', 'pasvaz.bindonce'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {

@@ -309,6 +309,7 @@ angular.module('Tomato.controllers', ['timer'])
 				columns: [ ['data', 0] ],
 				type: 'gauge'
 			},
+			legend: false,
 			gauge: {
 				label: {
 					show: false
