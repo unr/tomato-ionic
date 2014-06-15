@@ -456,6 +456,8 @@ angular.module('Tomato.controllers', ['timer'])
 	 */
 	var finishTimer = function() {
 		$scope.timer.percent = 100;
+		$scope.timer.running = false;
+		$scope.timer.remaining = 0;
 		updateChart();
 
 		$scope.timer.state = "timer_finished";
@@ -482,6 +484,8 @@ angular.module('Tomato.controllers', ['timer'])
 	 * Running this will also unset all the values on regular timer.
 	 */
 	$scope.startBreakTimer = function() {
+
+		$scope.restoreDefaults();
 
 		$scope.break_timer_started = new Date();
 
@@ -510,6 +514,14 @@ angular.module('Tomato.controllers', ['timer'])
 
 		$scope.break_timer_set = true;
 
+		/**
+		 * Our break timer doesn't seem to autostart, thanks to already
+		 * broadcasting to angular-timer to stop our timer.
+		 *
+		 * Going to broadcast to start again
+		 */
+		$scope.$broadcast('timer-start');
+
 	}
 
 	/**
@@ -518,7 +530,6 @@ angular.module('Tomato.controllers', ['timer'])
 	 * Sets up the timer attributes, and then runs start timer
 	 */
 	$scope.startTimer = function() {
-		console.log('timer tryign to start, yo');
 		$scope.timer_started = new Date();
 
 		/**
@@ -544,7 +555,6 @@ angular.module('Tomato.controllers', ['timer'])
 		$scope.timer_start_time = $scope.timer_started.getTime();
 		$scope.timer_end_time = $scope.timer_should_end.getTime();
 
-		$scope.timer_set = true;
 
 		/**
 		 * If we've never created the chart element, it needs to be created now.
@@ -556,6 +566,7 @@ angular.module('Tomato.controllers', ['timer'])
 			createChart();
 		}
 
+		$scope.$broadcast('timer-start');
 	};
 
 	/**
@@ -627,8 +638,8 @@ angular.module('Tomato.controllers', ['timer'])
 		}
 
 		if ($scope.debug) {
-			//console.log(event);
-			//console.log('Timer Stopped - data = ', data);
+			console.log(event);
+			console.log('Timer Stopped - data = ', data);
 		}
 	});
 
@@ -655,20 +666,6 @@ angular.module('Tomato.controllers', ['timer'])
 			finishTimer();
 		}
 
-		// reset timer event variables
-		$scope.timer.running = false;
-		$scope.timer.remaining = 0;
-
-		/**
-		 * Stops our timer where it is, and updates our chart to look like
-		 * our current percent.
-		 */
-		updateChart();
-		//stopTimer();
-
-		//$scope.$broadcast('timer-next');
-
-
 	});
 
 	/**
@@ -690,16 +687,12 @@ angular.module('Tomato.controllers', ['timer'])
 		 */
 		if ( $scope.timer.state === "break_timer" ) {
 			$rootScope.timer.break_percent = getPercentage(millis, $scope.timer.break.ms);
-			$rootScope.timer.percent = 0;
-
-			updateBreakChart();
 		} else {
 			$rootScope.timer.percent = getInversePercentage(millis, $scope.timer.length.ms);
-			$rootScope.timer.break_percent = 0;
-
-			// moved here, since break timer doesn't have a chart right now
-			updateChart();
 		}
+
+		updateBreakChart();
+		updateChart();
 
 		if($scope.debug && $scope.debug.logPercent) {
 			console.log($scope.timer.percent);
