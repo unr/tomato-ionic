@@ -10,3 +10,21 @@
 img {
 	max-width: 100%;
 }
+
+
+/**
+ * Chart styling
+ */
+
+
+/**
+ * Background line, of chart arc
+ */
+.c3-chart-arcs-background {
+	fill: #ffffff;
+}
+
+/* Hide percentage in svg */
+.c3-gauge-value {
+	display: none!important;
+}
