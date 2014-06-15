@@ -5,13 +5,33 @@
 		</ion-nav-buttons>
 
 		<div class='card card--timer'>
-			<div id="timer-chart">showing you stuff</div>
+			<div class='chart-wrapper'>
+				<div class='chart' id="timer-chart"></div>
+			</div>
 
 			<timer ng-if="timer_set" interval="10000" start-time="timer_start_time" end-time="timer_end_time">
 				{{mminutes}}:{{sseconds}}
 			</timer>
 			<div ng-if="!timer_set" class='placeholder-timer'>
 				{{timer.length.label}}
+			</div>
+		</div>
+
+		<div class='card card--break'>
+			<div class='item'>
+				<p><strong>Break:</strong></p>
+				<timer ng-if="break_timer_set" interval="10000" start-time="break_timer_start_time" end-time="break_timer_end_time">
+					{{mminutes}}:{{sseconds}}
+				</timer>
+				<div ng-if="!break_timer_set" class='placeholder-timer'>
+					{{timer.break.label}}
+				</div>
+				<div id='break-progress'
+					style="width: 100%; height: 4px; background: blue;" >
+				</div>
+			</div>
+			<div class='item'>
+				<a class='button button-positive button-small' ng-click="beginBreak()">start break</a>
 			</div>
 		</div>
 
@@ -27,8 +47,11 @@
 			</div>
 
 			<div class="item tabs">
-				<a class="tab-item" ng-click="beginTimer()">
+				<a class="tab-item" ng-if="timer.state != 'paused'" ng-click="beginTimer()">
 					<i class="icon ion-ios7-play-outline"></i>
+				</a>
+				<a class="tab-item" ng-if="timer.state === 'paused'" ng-click="resumeTimer()">
+					<i class="icon ion-ios7-play"></i>
 				</a>
 				<a class="tab-item" ng-click="pauseTimer()">
 					<i class="icon ion-ios7-pause-outline"></i>
@@ -37,10 +60,8 @@
 					<i class="icon ion-ios7-reload"></i>
 				</a>
 			</div>
-
-			<div class='item item--timer'>
-				<p>Starts:<br />{{timer_started}}</p>
-				<p>Should end:<br />{{timer_should_end}}</p>
+			<div class="item">
+				{{timer.state}}
 			</div>
 
 		</div>

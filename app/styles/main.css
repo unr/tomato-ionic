@@ -15,6 +15,18 @@ img {
 /**
  * Chart styling
  */
+.chart-wrapper {
+	overflow: hidden;
+	height: 160px;
+}
+
+#timer-chart {
+}
+
+#break-progress {
+	-webkit-transition: all 800ms;
+	transition:         all 800ms;
+}
 
 
 /**
