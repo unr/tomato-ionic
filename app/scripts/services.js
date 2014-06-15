@@ -138,7 +138,6 @@ angular.module('Tomato.services', [])
 
 			return {
 				id: parseInt(currentIndex)+1,
-				percent: 0,
 				state: 'off'
 			}
 		}

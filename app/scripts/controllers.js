@@ -120,7 +120,8 @@ angular.module('Tomato.controllers', ['timer'])
 			$scope.modal = modal;
 
 			// we make a copy, so our edits aren't immediate
-			$scope.modal.timer = angular.copy(Timers.get(timer_slug));
+			$scope.modal.timer = angular.copy($scope.timer);
+			//$scope.modal.timer = $rootScope.timer;
 
 			$scope.modal.show();
 
@@ -230,7 +231,11 @@ angular.module('Tomato.controllers', ['timer'])
 /**
  * Timer Dashboard Controller
  */
-.controller('DashCtrl', function($scope, Timers) {
+.controller('DashCtrl', function($scope, $rootScope, Timers) {
+
+	// Dashboard view should nuke selected timer
+	$rootScope.timer = {};
+
 })
 
 /**
@@ -254,13 +259,14 @@ angular.module('Tomato.controllers', ['timer'])
 	 * Called once when the view is entered, and again when a timer is complete.
 	 */
 	$scope.restoreDefaults = function() {
-		$scope.timer.running = false;
+		$scope.timer_running = false;
 		$scope.timer_set = false;
 		$scope.break_timer_set = false;
 		$scope.chart_set = false;
 		$scope.timer.remaining = 0;
 		$scope.timer.percentage = 0;
-		$scope.timer.break_percent = 100;
+		$scope.timer.break_percentage = 100;
+		$scope.timer.state = 'off';
 	}
 
 	/**
@@ -307,29 +313,12 @@ angular.module('Tomato.controllers', ['timer'])
 	}
 
 	/**
-	 * Start Angular Timer, Utility Function
-	 */
-	var startTimerOLD = function() {
-		if (!$scope.timer.running) {
-			$scope.$broadcast('timer-start');
-			$scope.timer.running = true;
-
-			// If this was break, keep it labeled as break
-			if ( $scope.timer.state === "on_break" ) {
-				$scope.timer.state = 'running_on_break';
-			} else {
-				$scope.timer.state = 'running';
-			}
-		}
-	};
-
-	/**
 	 * Stop Angular Timer, Utility Function
 	 */
 	var stopTimer = function() {
 		$scope.timer_stopped_last = new Date();
 		$scope.timer.remaining = $scope.timer_should_end - $scope.timer_stopped_last;
-		$scope.timer.running = false;
+		$scope.timer_running = false;
 		$scope.$broadcast('timer-stop');
 	};
 
@@ -342,7 +331,7 @@ angular.module('Tomato.controllers', ['timer'])
 		if ( !$scope.chart_set ){
 			$scope.chart_set = true;
 
-			$scope.timer.chart = c3.generate({
+			$scope.timer_chart = c3.generate({
 				bindto: '#timer-chart',
 				data: {
 					columns: [ ['data', 0] ],
@@ -370,6 +359,11 @@ angular.module('Tomato.controllers', ['timer'])
 	}
 
 	/**
+	 * When loading the timer view, ensure we've created our chart element.
+	 */
+	createChart();
+
+	/**
 	 * clear Angular Timer, Utility Function
 	 */
 	var clearTimer = function() {
@@ -384,7 +378,7 @@ angular.module('Tomato.controllers', ['timer'])
 	 */
 	var updateChart = function() {
 		if ( $scope.chart_set ) {
-			$scope.timer.chart.load({
+			$scope.timer_chart.load({
 				columns: [ ['data', $scope.timer.percent] ]
 			});
 		}
@@ -403,7 +397,7 @@ angular.module('Tomato.controllers', ['timer'])
 	var updateBreakChart = function() {
 		if ( $scope.break_timer_set ) {
 			var el = document.getElementById('break-progress'),
-				px = $scope.timer.break_percent+"%";
+				px = $scope.timer.break_percentage+"%";
 			el.style.width = px;
 		}
 	}
@@ -428,7 +422,7 @@ angular.module('Tomato.controllers', ['timer'])
 	 * and marks the state as complete.
 	 */
 	var finishBreak = function() {
-		$scope.timer.break_percent = 0;
+		$scope.timer.break_percentage = 0;
 		updateBreakChart();
 
 		$scope.timer.state = "complete";
@@ -456,7 +450,7 @@ angular.module('Tomato.controllers', ['timer'])
 	 */
 	var finishTimer = function() {
 		$scope.timer.percent = 100;
-		$scope.timer.running = false;
+		$scope.timer_running = false;
 		$scope.timer.remaining = 0;
 		updateChart();
 
@@ -485,7 +479,7 @@ angular.module('Tomato.controllers', ['timer'])
 	 */
 	$scope.startBreakTimer = function() {
 
-		$scope.restoreDefaults();
+		_apply($scope.timer_set = false);
 
 		$scope.break_timer_started = new Date();
 
@@ -512,7 +506,7 @@ angular.module('Tomato.controllers', ['timer'])
 		$scope.break_timer_start_time = $scope.break_timer_started.getTime();
 		$scope.break_timer_end_time = $scope.break_timer_should_end.getTime();
 
-		$scope.break_timer_set = true;
+		_apply($scope.break_timer_set = true);
 
 		/**
 		 * Our break timer doesn't seem to autostart, thanks to already
@@ -555,6 +549,7 @@ angular.module('Tomato.controllers', ['timer'])
 		$scope.timer_start_time = $scope.timer_started.getTime();
 		$scope.timer_end_time = $scope.timer_should_end.getTime();
 
+		$scope.timer_set = true;
 
 		/**
 		 * If we've never created the chart element, it needs to be created now.
@@ -562,11 +557,9 @@ angular.module('Tomato.controllers', ['timer'])
 		 * TODO: Maybe this should move to the timer controller, instead of
 		 * in this function?
 		 */
-		if ( !$scope.chart_set ) {
-			createChart();
-		}
 
 		$scope.$broadcast('timer-start');
+		$scope.timer_running = true;
 	};
 
 	/**
@@ -598,7 +591,7 @@ angular.module('Tomato.controllers', ['timer'])
 	 * When timer.remaining is set to 0, the next loop of beginTimer
 	 * will start with the original timer value again.
 	 *
-	 * Resets and updates timer chart to 0
+	 * Resets and updates timer_chart to 0
 	 *
 	 */
 	$scope.resetTimer = function() {
@@ -627,7 +620,7 @@ angular.module('Tomato.controllers', ['timer'])
 	 * any remaining ms.
 	 */
 	$scope.$on('timer-stopped', function (event, data){
-		$scope.timer.running = false;
+		$scope.timer_running = false;
 
 		/**
 		 * If the timer stops, and there are no millis left, our timer
@@ -686,7 +679,7 @@ angular.module('Tomato.controllers', ['timer'])
 		 * empty the gauge from 100-0 as time goes on.
 		 */
 		if ( $scope.timer.state === "break_timer" ) {
-			$rootScope.timer.break_percent = getPercentage(millis, $scope.timer.break.ms);
+			$rootScope.timer.break_percentage = getPercentage(millis, $scope.timer.break.ms);
 		} else {
 			$rootScope.timer.percent = getInversePercentage(millis, $scope.timer.length.ms);
 		}
@@ -751,7 +744,7 @@ angular.module('Tomato.controllers', ['timer'])
 			 * should trigger repeat if available
 			 */
 			case "complete" :
-				console.log("complete, yo");
+				alert('Holy shit its working!');
 				$scope.timer.state = "off";
 				$scope.resetTimer();
 				break;
@@ -796,9 +789,11 @@ var _apply = function( to_apply ) {
 	 * TODO remove this before it causes an issue
 	 * http://stackoverflow.com/a/12859093/196822
 	 */
-	if (!$scope.$$phase) {
+	if (typeof($scope) != undefined && !$scope.$$phase) {
 		$scope.$apply(function(){
 			to_apply;
 		});
+	} else {
+		to_apply;
 	}
 }
