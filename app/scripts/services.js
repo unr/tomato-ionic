@@ -8,6 +8,8 @@ angular.module('Tomato.services', [])
 	return {
 		timer_lengths: function() {
 			return [
+				{ label : "0:03" , value : 0.05, ms : 3000 },
+				{ label : "0:15" , value : 0.25, ms : 15000 },
 				{ label : "1:00" , value : 1, ms : 60000 },
 				{ label : "5:00" , value : 5, ms : 300000 },
 				{ label : "10:00" , value : 10, ms : 600000 },
@@ -18,6 +20,8 @@ angular.module('Tomato.services', [])
 		},
 		break_lengths: function() {
 			return [
+				{ label : "0:03" , value : 0.05, ms : 3000 },
+				{ label : "0:15" , value : 0.25, ms : 15000 },
 				{ label : "1:00" , value : 1, ms : 60000 },
 				{ label : "2:00" , value : 2, ms : 120000 },
 				{ label : "3:00" , value : 3, ms : 180000 },
@@ -133,7 +137,9 @@ angular.module('Tomato.services', [])
 			}
 
 			return {
-				id: parseInt(currentIndex)+1
+				id: parseInt(currentIndex)+1,
+				percent: 0,
+				state: 'off'
 			}
 		}
 	}

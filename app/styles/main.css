@@ -23,6 +23,11 @@ img {
 #timer-chart {
 }
 
+#break-progress {
+	-webkit-transition: all 800ms;
+	transition:         all 800ms;
+}
+
 
 /**
  * Background line, of chart arc
