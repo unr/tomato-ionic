@@ -5,6 +5,11 @@
 		</ion-nav-buttons>
 
 		<div class='card card--timer'>
+			<img src="http://f.cl.ly/items/3m1k0W3C09322233251R/Image%202014-06-14%20at%209.24.05%20PM.png" />
+			{{timer.length.label}} - {{timer.percent}}
+		</div>
+
+		<div class='card card--timer'>
 			<div class='item item-toggle'>
 				Repeat Timer
 				<label class="toggle toggle-assertive">
@@ -30,10 +35,11 @@
 			<div class='item item--timer'>
 				<p>Starts:<br />{{timer_started}}</p>
 				<p>Should end:<br />{{timer_should_end}}</p>
+				{{timer.length.ms}}
 				<br />
 				<br />
-				<timer ng-if="timer_set" start-time="timer_start_time" end-time="timer_end_time">
-					{{hours}} hours, {{minutes}} minutes, {{seconds}} seconds.
+				<timer ng-if="timer_set" interval="1000" start-time="timer_start_time" end-time="timer_end_time">
+					{{mminutes}}:{{sseconds}}
 				</timer>
 			</div>
 

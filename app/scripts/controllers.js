@@ -58,8 +58,8 @@ angular.module('Tomato.controllers', ['timer'])
 	/**
 	 * Get our timer options, for use in creation
 	 */
-	$scope.timer_lengths = Options.timer_lengths();
-	$scope.break_lengths = Options.break_lengths();
+	$rootScope.timer_lengths = Options.timer_lengths();
+	$rootScope.break_lengths = Options.break_lengths();
 
 	/**
 	 * New Timer Modal
@@ -198,15 +198,11 @@ angular.module('Tomato.controllers', ['timer'])
 		 * back over itself to preserve our edits.
 		 */
 		} else {
-			console.log($scope.timers);
-
 			// gets the current timer index
 			var index_to_update = getTimerIndexBySlug($scope.modal.timer.slug);
 
 			$scope.timers[index_to_update] = angular.copy($scope.modal.timer);
 			$rootScope.timer = angular.copy($scope.modal.timer);
-
-			console.log($scope.timers);
 		}
 
 		Timers.save($scope.timers);
@@ -215,26 +211,21 @@ angular.module('Tomato.controllers', ['timer'])
 	};
 
 	/**
-	 * DELETE FOR PROD,
-	 *
 	 * utility function to delete all timers
 	 */
 	$scope.deleteAllTimers = function() {
-		$scope.timers = [];
-		Timers.save($scope.timers);
+		if ($scope.debug) {
+			$scope.timers = [];
+			Timers.save($scope.timers);
+		}
 	}
 
 })
 
 /**
  * Timer Dashboard Controller
- *
- * Should list existing timers from localstorage, as well as handle adding new
- * timers to the app.
  */
 .controller('DashCtrl', function($scope, Timers) {
-
-
 })
 
 /**
@@ -245,6 +236,9 @@ angular.module('Tomato.controllers', ['timer'])
  */
 .controller('TimerCtrl', function($scope, $rootScope, $stateParams, Timers) {
 
+	/**
+	 * Utility function that converts minutes to milliseconds
+	 */
 	var minutesToMilliseconds = function(minutes) {
 		return minutes*60000;
 	}
@@ -264,19 +258,31 @@ angular.module('Tomato.controllers', ['timer'])
 	}
 
 	/**
+	 * Utility function that calculates percent of timer left
+	 */
+	var percentLeft = function(current_millis, timer_millis) {
+		var percentage = current_millis / timer_millis;
+		return parseFloat( percentage.toFixed(2) );
+	}
+
+	/**
 	 * Start Angular Timer, Utility Function
 	 */
 	var startTimer = function() {
-		$scope.$broadcast('timer-start');
-		$scope.timer_running = true;
+		if (!$scope.timer_running) {
+			$scope.$broadcast('timer-start');
+			$scope.timer_running = true;
+		}
 	};
 
 	/**
 	 * Stop Angular Timer, Utility Function
 	 */
 	var stopTimer = function() {
-		$scope.$broadcast('timer-stop');
-		$scope.timer_running = false;
+		if ($scope.timer_running) {
+			$scope.$broadcast('timer-stop');
+			$scope.timer_running = false;
+		}
 	};
 
 	/**
@@ -325,11 +331,10 @@ angular.module('Tomato.controllers', ['timer'])
 		 * Start a new timer, and replace timer.length with
 		 * timer_remaining.
 		 */
-		console.log($scope.timer_remaining);
 		if ( $scope.timer_remaining > 0 ) {
 			$scope.timer_should_end = addMilliseconds($scope.timer_started, $scope.timer_remaining);
 		} else {
-			$scope.timer_should_end = addMinutes($scope.timer_started, $scope.timer.length);
+			$scope.timer_should_end = addMinutes($scope.timer_started, $scope.timer.length.value);
 		}
 
 		$scope.timer_set = true;
@@ -376,18 +381,41 @@ angular.module('Tomato.controllers', ['timer'])
 	 * until the timer stops to finish updating events.
 	 *
 	 * Doesn't play nice with our intentions.
-	$scope.$on('timer-tick', function (event, data){
-	});
 	 */
+	$scope.$on('timer-tick', function (event, data){
+		$scope.$broadcast('timer-percent', data.millis);
+	});
 
 	/**
 	 * fires when the timer is paused.
 	 */
 	$scope.$on('timer-stopped', function (event, data){
+		$scope.timer.percent = 0;
+		$scope.timer.remaining = 0;
+		$scope.timer_running = false;
+
 		if ($scope.debug) {
 			console.log(event);
 			console.log('Timer Stopped - data = ', data);
 		}
+	});
+
+	$scope.$on('timer-percent', function(event, millis){
+
+		/**
+		 * Using scope.$$phase is a bad pattern, but it will prevent my
+		 * issue for now.
+		 *
+		 * TODO remove this before it causes an issue
+		 * http://stackoverflow.com/a/12859093/196822
+		 */
+		if (!$scope.$$phase) {
+			$scope.$apply(function(){
+				$rootScope.timer.percent = percentLeft(millis, $scope.timer.length.ms);
+			});
+		} else {
+			$scope.timer.percent = 100;
+		};
 	});
 
 })
