@@ -260,8 +260,17 @@ angular.module('Tomato.controllers', ['timer'])
 	/**
 	 * Utility function that calculates percent of timer left
 	 */
-	var percentLeft = function(current_millis, timer_millis) {
-		var percentage = current_millis / timer_millis;
+	var getPercentage = function(current_millis, timer_millis) {
+		var percentage = current_millis / timer_millis * 100;
+		return parseFloat( percentage.toFixed(2) );
+	}
+
+	/**
+	 * Utility function that calculates inverse percent of timer left
+	 * ie, instead of getting 100-0%, will get 0-100%
+	 */
+	var getInversePercentage = function(current_millis, timer_millis) {
+		var percentage = 100 - (current_millis / timer_millis * 100);
 		return parseFloat( percentage.toFixed(2) );
 	}
 
@@ -286,6 +295,40 @@ angular.module('Tomato.controllers', ['timer'])
 	};
 
 	/**
+	 * Show chart, utility function
+	 *
+	 * Used to create the chart element on the timer
+	 */
+	var showChart = function() {
+
+		$scope.chart_set = true;
+
+		$scope.timer.chart = c3.generate({
+			bindto: '#timer-chart',
+			data: {
+				columns: [ ['data', 0] ],
+				type: 'gauge'
+			},
+			gauge: {
+				label: {
+					show: false
+				},
+				min: 0,
+				max: 100,
+				width: 5,
+				color: {
+					pattern: ['#FF0000', '#F97600', '#F6C600', '#60B044'],
+					threshold: {
+						//unit: 'value', // percentage is default
+						//max: 200, // 100 is default
+						values: [30, 60, 90, 100]
+					}
+				}
+			}
+		});
+	}
+
+	/**
 	 * clear Angular Timer, Utility Function
 	 */
 	var clearTimer = function() {
@@ -296,14 +339,16 @@ angular.module('Tomato.controllers', ['timer'])
 	// gets our current views timer
 	$rootScope.timer = Timers.get($stateParams.timerId);
 
-	// Timer is not set until begin is hit first time
+	// Timer and chart are not set until begin is hit first time
 	$scope.timer_set = false;
+	$scope.chart_set = false;
 
 	// Timer running variable, false by default
 	$scope.timer_running = false;
 
 	// time remaining variable, 0 by default
 	$scope.timer_remaining = 0;
+
 
 	/**
 	 * Edit timer
@@ -344,6 +389,8 @@ angular.module('Tomato.controllers', ['timer'])
 		$scope.timer_end_time = $scope.timer_should_end.getTime();
 
 		startTimer();
+
+		showChart();
 
 	};
 
@@ -390,8 +437,6 @@ angular.module('Tomato.controllers', ['timer'])
 	 * fires when the timer is paused.
 	 */
 	$scope.$on('timer-stopped', function (event, data){
-		$scope.timer.percent = 0;
-		$scope.timer.remaining = 0;
 		$scope.timer_running = false;
 
 		if ($scope.debug) {
@@ -411,11 +456,20 @@ angular.module('Tomato.controllers', ['timer'])
 		 */
 		if (!$scope.$$phase) {
 			$scope.$apply(function(){
-				$rootScope.timer.percent = percentLeft(millis, $scope.timer.length.ms);
+				$rootScope.timer.percent = getInversePercentage(millis, $scope.timer.length.ms);
 			});
 		} else {
-			$scope.timer.percent = 100;
+			$scope.timer.percent = 0;
 		};
+
+		// Passes the current percent value to c3
+		$scope.timer.chart.load({
+			columns: [ ['data', $scope.timer.percent] ]
+		});
+
+		if($scope.debug) {
+			console.log($scope.timer.percent);
+		}
 	});
 
 })
