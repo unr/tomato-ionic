@@ -323,6 +323,18 @@ angular.module('Tomato.controllers', ['timer'])
 	};
 
 	/**
+	 * Passes the current timer percent to the chart.
+	 */
+	var updateChart = function(load) {
+		if ( $scope.chart_set ) {
+			load = typeof load !== 'undefined' ? load : $scope.timer.percent;
+			$scope.timer_chart.load({
+				columns: [ ['data', load] ]
+			});
+		}
+	}
+
+	/**
 	 * Show chart, utility function
 	 *
 	 * Used to create the chart element on the timer
@@ -355,6 +367,13 @@ angular.module('Tomato.controllers', ['timer'])
 					}
 				}
 			});
+
+			$scope.$timeoutId = $timeout(function(){
+				updateChart(40);
+			}, 300)
+			$scope.$timeoutId = $timeout(function(){
+				updateChart(100);
+			}, 850)
 		}
 	}
 
@@ -372,17 +391,6 @@ angular.module('Tomato.controllers', ['timer'])
 		$scope.break_timer_set = false;
 		$scope.timer.state = 'off'
 	};
-
-	/**
-	 * Passes the current timer percent to the chart.
-	 */
-	var updateChart = function() {
-		if ( $scope.chart_set ) {
-			$scope.timer_chart.load({
-				columns: [ ['data', $scope.timer.percent] ]
-			});
-		}
-	}
 
 	/**
 	 * Update Break Chart
@@ -789,7 +797,7 @@ var _apply = function( to_apply ) {
 	 * TODO remove this before it causes an issue
 	 * http://stackoverflow.com/a/12859093/196822
 	 */
-	if (typeof($scope) != undefined && !$scope.$$phase) {
+	if (typeof($scope) != 'undefined' && !$scope.$$phase) {
 		$scope.$apply(function(){
 			to_apply;
 		});
