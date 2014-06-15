@@ -6,3 +6,7 @@
   width: 96px;
   height: 96px;
 }
+
+img {
+	max-width: 100%;
+}

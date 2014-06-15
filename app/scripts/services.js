@@ -8,20 +8,21 @@ angular.module('Tomato.services', [])
 	return {
 		timer_lengths: function() {
 			return [
-				{ label : "5:00" , value : 5 },
-				{ label : "10:00" , value : 10 },
-				{ label : "15:00" , value : 15 },
-				{ label : "20:00" , value : 20 },
-				{ label : "25:00" , value : 25 }
+				{ label : "1:00" , value : 1, ms : 60000 },
+				{ label : "5:00" , value : 5, ms : 300000 },
+				{ label : "10:00" , value : 10, ms : 600000 },
+				{ label : "15:00" , value : 15, ms : 900000 },
+				{ label : "20:00" , value : 20, ms : 1200000 },
+				{ label : "25:00" , value : 25, ms : 1500000 }
 			];
 		},
 		break_lengths: function() {
 			return [
-				{ label : "1:00" , value : 1 },
-				{ label : "2:00" , value : 2 },
-				{ label : "3:00" , value : 3 },
-				{ label : "4:00" , value : 4 },
-				{ label : "5:00" , value : 5 }
+				{ label : "1:00" , value : 1, ms : 60000 },
+				{ label : "2:00" , value : 2, ms : 120000 },
+				{ label : "3:00" , value : 3, ms : 180000 },
+				{ label : "4:00" , value : 4, ms : 240000 },
+				{ label : "5:00" , value : 5, ms : 300000 }
 			];
 		}
 	}
