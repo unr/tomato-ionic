@@ -8,10 +8,10 @@ angular.module('Tomato.services', [])
 	return {
 		timer_lengths: function() {
 			return [
-				{ label : "0:03" , value : 0.05, ms : 3000 },
-				{ label : "0:15" , value : 0.25, ms : 15000 },
-				{ label : "1:00" , value : 1, ms : 60000 },
-				{ label : "5:00" , value : 5, ms : 300000 },
+				{ label : "00:03" , value : 0.05, ms : 3000 },
+				{ label : "00:15" , value : 0.25, ms : 15000 },
+				{ label : "01:00" , value : 1, ms : 60000 },
+				{ label : "05:00" , value : 5, ms : 300000 },
 				{ label : "10:00" , value : 10, ms : 600000 },
 				{ label : "15:00" , value : 15, ms : 900000 },
 				{ label : "20:00" , value : 20, ms : 1200000 },
@@ -20,13 +20,13 @@ angular.module('Tomato.services', [])
 		},
 		break_lengths: function() {
 			return [
-				{ label : "0:03" , value : 0.05, ms : 3000 },
-				{ label : "0:15" , value : 0.25, ms : 15000 },
-				{ label : "1:00" , value : 1, ms : 60000 },
-				{ label : "2:00" , value : 2, ms : 120000 },
-				{ label : "3:00" , value : 3, ms : 180000 },
-				{ label : "4:00" , value : 4, ms : 240000 },
-				{ label : "5:00" , value : 5, ms : 300000 }
+				{ label : "00:03" , value : 0.05, ms : 3000 },
+				{ label : "00:15" , value : 0.25, ms : 15000 },
+				{ label : "01:00" , value : 1, ms : 60000 },
+				{ label : "02:00" , value : 2, ms : 120000 },
+				{ label : "03:00" , value : 3, ms : 180000 },
+				{ label : "04:00" , value : 4, ms : 240000 },
+				{ label : "05:00" , value : 5, ms : 300000 }
 			];
 		}
 	}
