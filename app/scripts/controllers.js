@@ -575,7 +575,7 @@ angular.module('Tomato.controllers', ['timer'])
 		$scope.break_timer_start_time = $scope.break_timer_started.getTime();
 		$scope.break_timer_end_time = $scope.break_timer_should_end.getTime();
 
-		_apply($scope.break_timer_set = true);
+		$scope.break_timer_set = true;
 
 		/**
 		 * Our break timer doesn't seem to autostart, thanks to already
@@ -778,7 +778,7 @@ angular.module('Tomato.controllers', ['timer'])
 			console.log("State: " + $scope.timer.state);
 		}
 
-		updateChartClass();
+		//updateChartClass();
 
 		/**
 		 * Switch based on case, and trigger the correct event.
