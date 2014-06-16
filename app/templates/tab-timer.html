@@ -4,34 +4,34 @@
 			<button class="button button-clear icon ion-ios7-compose-outline" ng-click="editTimerModal(timer.slug)"></button>
 		</ion-nav-buttons>
 
-		<div class='card card--timer'>
-			<div class='chart-wrapper'>
-				<div class='chart' id="timer-chart"></div>
-			</div>
+		<div class='card card--timer timer-active' id='chart-div'>
+			<div class='item item-nopadding'>
+				<div class='chart-wrapper'>
+					<div class='chart' id="timer-chart"></div>
+				</div>
 
-			<timer ng-if="timer_set" interval="10000" class='the-timer' start-time="timer_start_time" end-time="timer_end_time">
-				{{mminutes}}:{{sseconds}}
-			</timer>
-			<div ng-if="!timer_set" class='placeholder-timer'>
-				{{timer.length.label}}
-			</div>
-		</div>
-
-		<div class='card card--break'>
-			<div class='item'>
-				<p><strong>Break:</strong></p>
-				<timer ng-if="break_timer_set" class='the-break-timer' interval="10000" start-time="break_timer_start_time" end-time="break_timer_end_time">
-					{{mminutes}}:{{sseconds}}
+				<timer ng-if="timer_set" class="the-timer" interval="10000" start-time="timer_start_time" end-time="timer_end_time">
+					<p>{{mminutes}}:{{sseconds}}</p>
 				</timer>
-				<div ng-if="!break_timer_set" class='placeholder-break-timer'>
-					{{timer.break.label}}
-				</div>
-				<div id='break-progress'
-					style="width: 100%; height: 4px; background: blue;" >
+				<div ng-if="!timer_set" class="placeholder-timer">
+					<p ng-if="!break_timer_set">{{timer.length.label}}</p>
+					<p ng-if="break_timer_set">BREAK</p>
 				</div>
 			</div>
-			<div class='item'>
-				<a class='button button-positive button-small' ng-click="beginBreak()">start break</a>
+
+			<div class='item item-thinpadding'>
+				<div class='break-timer-label clearfix'>
+					<p>Break timer</p>
+					<timer ng-if="break_timer_set" class='the-break-timer' interval="10000" start-time="break_timer_start_time" end-time="break_timer_end_time">
+						{{mminutes}}:{{sseconds}}
+					</timer>
+					<div ng-if="!break_timer_set" class='placeholder-break-timer'>
+						{{timer.break.label}}
+					</div>
+				</div>
+				<div class='progress-wrapper'>
+					<div id='break-progress' style="width: 100%; height: 4px;"></div>
+				</div>
 			</div>
 		</div>
 
