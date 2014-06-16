@@ -1,4 +1,46 @@
 'use strict';
+/**
+ * Global function for easily using the scopy apply wrapper.
+ *
+ * Pass arguments to this that aren't being applied nicely, so we can update
+ * them by force.
+ *
+ * TODO: Move this to a utils.js file for global util functions.
+ */
+var _apply = function( to_apply ) {
+	/**
+	 * Using scope.$$phase is a bad pattern, but it will prevent my
+	 * issue for now.
+	 *
+	 * TODO remove this before it causes an issue
+	 * http://stackoverflow.com/a/12859093/196822
+	 */
+	if (typeof($scope) != 'undefined' && !$scope.$$phase) {
+		$scope.$apply(function(){
+			to_apply;
+		});
+	} else {
+		to_apply;
+	}
+}
+
+/**
+ * Utility classes for manipulating classes.
+ */
+var _hasClass = function(ele,cls) {
+	return ele.className.match(new RegExp('(\\s|^)'+cls+'(\\s|$)'));
+}
+var _addClass = function(ele,cls) {
+	if (!_hasClass(ele,cls)) ele.className += " "+cls;
+}
+var _removeClass = function(ele,cls) {
+	if (_hasClass(ele,cls)) {
+		var reg = new RegExp('(\\s|^)'+cls+'(\\s|$)');
+		ele.className=ele.className.replace(reg,' ');
+	}
+}
+
+
 angular.module('Tomato.controllers', ['timer'])
 
 /**
@@ -13,7 +55,7 @@ angular.module('Tomato.controllers', ['timer'])
 	 * debug events in console.
 	 */
 	$scope.debug = true;
-	$scope.debug.logPercent = false;
+	$scope.debug_log_percent = false;
 
 	/**
 	 * Whether or not we are 'editing' an item flag. Used for saving modals
@@ -285,7 +327,7 @@ angular.module('Tomato.controllers', ['timer'])
 	 * Utility function for adding minutes to time
 	 */
 	var addMinutes = function(date_obj, minutes) {
-	    return new Date(date_obj.getTime() + minutesToMilliseconds(minutes));
+	    return new Date(date_obj.getTime() + minutesToMilliseconds(minutes) + 1000);
 	}
 
 	/**
@@ -300,6 +342,9 @@ angular.module('Tomato.controllers', ['timer'])
 	 */
 	var getPercentage = function(current_millis, timer_millis) {
 		var percentage = current_millis / timer_millis * 100;
+		if (percentage < 0) { percentage = 0; }
+		if (percentage > 0 && percentage < 1) { percentage = 1; }
+		if (percentage > 100) { percentage = 100; }
 		return parseFloat( percentage.toFixed(2) );
 	}
 
@@ -309,6 +354,9 @@ angular.module('Tomato.controllers', ['timer'])
 	 */
 	var getInversePercentage = function(current_millis, timer_millis) {
 		var percentage = 100 - (current_millis / timer_millis * 100);
+		if (percentage < 0) { percentage = 0; }
+		if (percentage > 0 && percentage < 1) { percentage = 1; }
+		if (percentage > 100) { percentage = 100; }
 		return parseFloat( percentage.toFixed(2) );
 	}
 
@@ -321,6 +369,35 @@ angular.module('Tomato.controllers', ['timer'])
 		$scope.timer_running = false;
 		$scope.$broadcast('timer-stop');
 	};
+
+	/**
+	 * Passes the current timer percent to the chart.
+	 */
+	var updateChart = function(load) {
+		if ( $scope.chart_set ) {
+			load = typeof load !== 'undefined' ? load : $scope.timer.percent;
+			console.log(load);
+			$scope.timer_chart.load({
+				columns: [ ['data', load] ]
+			});
+		}
+	}
+
+	/**
+	 * Called when timer-next is updated
+	 *
+	 * Will set the appropriate style if the break timer is active.
+	 */
+	var updateChartClass = function() {
+		var chartDiv = document.getElementById('chart-div');
+		if ( $scope.timer.state === "break_timer" ) {
+			_addClass(chartDiv, 'break-active');
+			_removeClass(chartDiv, 'timer-active');
+		} else {
+			_addClass(chartDiv, 'timer-active');
+			_removeClass(chartDiv, 'break-active');
+		}
+	}
 
 	/**
 	 * Show chart, utility function
@@ -346,7 +423,7 @@ angular.module('Tomato.controllers', ['timer'])
 					max: 100,
 					width: 5,
 					color: {
-						pattern: ['#FF0000', '#F97600', '#F6C600', '#60B044'],
+						pattern: ['#4a87ee'],
 						threshold: {
 							//unit: 'value', // percentage is default
 							//max: 200, // 100 is default
@@ -355,6 +432,13 @@ angular.module('Tomato.controllers', ['timer'])
 					}
 				}
 			});
+
+			$scope.$timeoutId = $timeout(function(){
+				updateChart(40);
+			}, 300)
+			$scope.$timeoutId = $timeout(function(){
+				updateChart(100);
+			}, 850)
 		}
 	}
 
@@ -368,21 +452,7 @@ angular.module('Tomato.controllers', ['timer'])
 	 */
 	var clearTimer = function() {
 		$scope.$broadcast('timer-clear');
-		$scope.timer_set = false;
-		$scope.break_timer_set = false;
-		$scope.timer.state = 'off'
 	};
-
-	/**
-	 * Passes the current timer percent to the chart.
-	 */
-	var updateChart = function() {
-		if ( $scope.chart_set ) {
-			$scope.timer_chart.load({
-				columns: [ ['data', $scope.timer.percent] ]
-			});
-		}
-	}
 
 	/**
 	 * Update Break Chart
@@ -595,11 +665,21 @@ angular.module('Tomato.controllers', ['timer'])
 	 *
 	 */
 	$scope.resetTimer = function() {
-		$scope.timer.remaining = 0;
-		$scope.timer_set = false;
-		$scope.timer.percentage = 0;
 		clearTimer();
 		updateChart();
+		$scope.restoreDefaults();
+
+		/**
+		 * After restoring defaults, we still have a chart even though we
+		 * just set the flag to false. fix it here.
+		 */
+		$scope.chart_set = true;
+
+		/**
+		 * for some reason after finishing, it doesn't update the
+		 * break_timer_set watch?
+		 */
+		_apply($scope.break_timer_set = false);
 	};
 
 	/**
@@ -687,9 +767,12 @@ angular.module('Tomato.controllers', ['timer'])
 		updateBreakChart();
 		updateChart();
 
-		if($scope.debug && $scope.debug.logPercent) {
-			console.log($scope.timer.percent);
+		console.log("update chart should have been called");
+
+		if($scope.debug && $scope.debug_log_percent) {
+			console.log($rootScope.timer.percent);
 		}
+
 	});
 
 	/**
@@ -704,6 +787,8 @@ angular.module('Tomato.controllers', ['timer'])
 		if ( $scope.debug ) {
 			console.log("State: " + $scope.timer.state);
 		}
+
+		updateChartClass();
 
 		/**
 		 * Switch based on case, and trigger the correct event.
@@ -745,7 +830,6 @@ angular.module('Tomato.controllers', ['timer'])
 			 */
 			case "complete" :
 				alert('Holy shit its working!');
-				$scope.timer.state = "off";
 				$scope.resetTimer();
 				break;
 
@@ -772,28 +856,3 @@ angular.module('Tomato.controllers', ['timer'])
 
 .controller('AccountCtrl', function($scope) {
 });
-
-/**
- * Global function for easily using the scopy apply wrapper.
- *
- * Pass arguments to this that aren't being applied nicely, so we can update
- * them by force.
- *
- * TODO: Move this to a utils.js file for global util functions.
- */
-var _apply = function( to_apply ) {
-	/**
-	 * Using scope.$$phase is a bad pattern, but it will prevent my
-	 * issue for now.
-	 *
-	 * TODO remove this before it causes an issue
-	 * http://stackoverflow.com/a/12859093/196822
-	 */
-	if (typeof($scope) != undefined && !$scope.$$phase) {
-		$scope.$apply(function(){
-			to_apply;
-		});
-	} else {
-		to_apply;
-	}
-}

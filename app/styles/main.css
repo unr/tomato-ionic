@@ -11,6 +11,20 @@ img {
 	max-width: 100%;
 }
 
+.item-thinpadding {
+	padding: 10px 8px;
+}
+
+.item-nopadding {
+	padding: 0 0 5px;
+}
+
+
+.make-positive {
+	border-color: #145fd7;
+	background-color: #4a87ee;
+}
+
 /**
  * Timer styling
  */
@@ -26,15 +40,73 @@ img {
 	position: absolute;
 	z-index: 1000;
 	top: 50%;
-	left: 50%;
-	width: 110px;
+	left: 0;
 	text-align: center;
-	margin-left: -55px;
+	width: 100%;
+}
+.placeholder-timer p, .the-timer p {
+	text-align: center;
+	display: inline-block;
 	font-size: 28px;
 	font-weight: 100;
 	border: solid 1px #ccc;
-	padding: 8px 0;
+	padding: 8px 16px;
 	border-radius: 3px;
+	margin: 0;
+	white-space: nowrap;
+}
+
+.break-timer-label {
+	border: solid 1px #ccc;
+	padding: 8px;
+	border-radius: 3px 3px 0 0;
+}
+
+.break-timer-label p {
+	float: left;
+	font-size: 12px;
+	text-transform: uppercase;
+	font-weight: 400;
+	padding: 0;
+	margin: 0;
+}
+
+.placeholder-break-timer, .the-break-timer {
+	float: right;
+	font-weight: 300;
+	font-size: 14px;
+}
+
+/**
+ * Active states.
+ *
+ * .timer-active | timer is blue, break is grey
+ * .break-active | timer is green, break is blue
+ */
+.timer-active .placeholder-timer p, .timer-active .the-timer p,
+.break-active .break-timer-label  {
+	border: solid 1px #4a87ee;
+	color: #145fd7;
+}
+
+.timer-active #timer-chart .c3-arc {
+	fill: #4a87ee!important;
+}
+
+.break-active .break-timer-label p {
+	color: #145fd7;
+}
+.break-active #break-progress {
+	background: #4a87ee;
+}
+
+.break-active .placeholder-timer p, .break-active .the-timer p {
+	border: solid 1px #66cc33;
+	color: #66cc33;
+}
+
+.break-active #timer-chart .c3-arc {
+	fill: #66cc33!important;
 }
 
 
@@ -46,13 +118,22 @@ img {
 	height: 160px;
 }
 
-#timer-chart {
+#timer-chart .c3-arc {
+	fill: #cccccc!important;
 }
 
 #break-progress {
-	-webkit-transition: all 800ms;
-	transition:         all 800ms;
+	width: 100%;
+	background: transparent;
+	-webkit-transition: all 300ms;
+	transition:         all 300ms;
 }
+
+.progress-wrapper {
+	background: #eee;
+	width: 100%;
+}
+
 
 
 /**
