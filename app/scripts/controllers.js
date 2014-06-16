@@ -376,7 +376,6 @@ angular.module('Tomato.controllers', ['timer'])
 	var updateChart = function(load) {
 		if ( $scope.chart_set ) {
 			load = typeof load !== 'undefined' ? load : $scope.timer.percent;
-			console.log(load);
 			$scope.timer_chart.load({
 				columns: [ ['data', load] ]
 			});
@@ -621,13 +620,6 @@ angular.module('Tomato.controllers', ['timer'])
 
 		$scope.timer_set = true;
 
-		/**
-		 * If we've never created the chart element, it needs to be created now.
-		 *
-		 * TODO: Maybe this should move to the timer controller, instead of
-		 * in this function?
-		 */
-
 		$scope.$broadcast('timer-start');
 		$scope.timer_running = true;
 	};
@@ -767,8 +759,6 @@ angular.module('Tomato.controllers', ['timer'])
 		updateBreakChart();
 		updateChart();
 
-		console.log("update chart should have been called");
-
 		if($scope.debug && $scope.debug_log_percent) {
 			console.log($rootScope.timer.percent);
 		}
@@ -829,8 +819,20 @@ angular.module('Tomato.controllers', ['timer'])
 			 * should trigger repeat if available
 			 */
 			case "complete" :
-				alert('Holy shit its working!');
 				$scope.resetTimer();
+
+				// HERE WE ARE,
+			// Need to check if the timer has a repeat value set to true.
+			// bind that value to the toggle in the view.
+			// If its true, run an event called repeatTimer(),
+			// otherwise, just run resetTimer()
+			 //debugger
+
+				if ($scope.debug) {
+					console.log("@@@@@@@@@@@@@@@@@@@@");
+					console.log("@@@TIMER COMPLETE@@@");
+					console.log("@@@@@@@@@@@@@@@@@@@@");
+				}
 				break;
 
 			/**
