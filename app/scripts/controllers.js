@@ -317,6 +317,21 @@ angular.module('Tomato.controllers', ['timer'])
 	$scope.restoreDefaults();
 
 	/**
+	 * Utility function, used as a wrapper when broadcasting 'timer-next'.
+	 *
+	 * Calling timerNext() will add a 300ms delay, before actually broadcasting
+	 * 'timer-next'. Giving our app a second to breath before triggering the
+	 * next step.
+	 */
+
+	var timerNext = function(delay) {
+		delay = typeof delay !== 'undefined' ? delay : 300;
+		$scope.$timeoutId = $timeout(function(){
+			$scope.$broadcast('timer-next');
+		}, delay)
+	}
+
+	/**
 	 * Utility function that converts minutes to milliseconds
 	 */
 	var minutesToMilliseconds = function(minutes) {
@@ -327,7 +342,8 @@ angular.module('Tomato.controllers', ['timer'])
 	 * Utility function for adding minutes to time
 	 */
 	var addMinutes = function(date_obj, minutes) {
-	    return new Date(date_obj.getTime() + minutesToMilliseconds(minutes) + 1000);
+	    //return new Date(date_obj.getTime() + minutesToMilliseconds(minutes) + 1000);
+	    return new Date(date_obj.getTime() + minutesToMilliseconds(minutes));
 	}
 
 	/**
@@ -376,7 +392,6 @@ angular.module('Tomato.controllers', ['timer'])
 	var updateChart = function(load) {
 		if ( $scope.chart_set ) {
 			load = typeof load !== 'undefined' ? load : $scope.timer.percent;
-			console.log(load);
 			$scope.timer_chart.load({
 				columns: [ ['data', load] ]
 			});
@@ -481,7 +496,7 @@ angular.module('Tomato.controllers', ['timer'])
 	$scope.beginBreak = function() {
 		clearTimer();
 		$scope.timer.state = 'break_timer';
-		$scope.$broadcast('timer-next');
+		timerNext();
 	}
 
 	/**
@@ -496,7 +511,16 @@ angular.module('Tomato.controllers', ['timer'])
 		updateBreakChart();
 
 		$scope.timer.state = "complete";
-		$scope.$broadcast('timer-next');
+
+		/**
+		 * If the repeat is set to true, our timer should go back to the initial
+		 * state.
+		 */
+		if ($scope.timer.repeat) {
+			$scope.timer.state = "timer";
+		}
+
+		timerNext();
 	}
 
 
@@ -508,7 +532,7 @@ angular.module('Tomato.controllers', ['timer'])
 	 */
 	$scope.beginTimer = function() {
 		$scope.timer.state = 'timer';
-		$scope.$broadcast('timer-next');
+		timerNext();
 	}
 
 	/**
@@ -522,11 +546,10 @@ angular.module('Tomato.controllers', ['timer'])
 		$scope.timer.percent = 100;
 		$scope.timer_running = false;
 		$scope.timer.remaining = 0;
-		updateChart();
-
 		$scope.timer.state = "timer_finished";
 
-		$scope.$broadcast('timer-next');
+		updateChart();
+		timerNext();
 	}
 
 	/**
@@ -594,6 +617,9 @@ angular.module('Tomato.controllers', ['timer'])
 	 * Sets up the timer attributes, and then runs start timer
 	 */
 	$scope.startTimer = function() {
+
+		_apply($scope.timer_set = false);
+
 		$scope.timer_started = new Date();
 
 		/**
@@ -621,13 +647,6 @@ angular.module('Tomato.controllers', ['timer'])
 
 		$scope.timer_set = true;
 
-		/**
-		 * If we've never created the chart element, it needs to be created now.
-		 *
-		 * TODO: Maybe this should move to the timer controller, instead of
-		 * in this function?
-		 */
-
 		$scope.$broadcast('timer-start');
 		$scope.timer_running = true;
 	};
@@ -652,7 +671,7 @@ angular.module('Tomato.controllers', ['timer'])
 	 */
 	$scope.resumeTimer = function() {
 		$scope.timer.state = "timer";
-		$scope.$broadcast('timer-next');
+		timerNext();
 	}
 
 	/**
@@ -767,8 +786,6 @@ angular.module('Tomato.controllers', ['timer'])
 		updateBreakChart();
 		updateChart();
 
-		console.log("update chart should have been called");
-
 		if($scope.debug && $scope.debug_log_percent) {
 			console.log($rootScope.timer.percent);
 		}
@@ -829,7 +846,6 @@ angular.module('Tomato.controllers', ['timer'])
 			 * should trigger repeat if available
 			 */
 			case "complete" :
-				alert('Holy shit its working!');
 				$scope.resetTimer();
 				break;
 
